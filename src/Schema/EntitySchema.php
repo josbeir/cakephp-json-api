@@ -23,13 +23,19 @@ class EntitySchema extends SchemaProvider
     protected $_view;
 
     /**
-     * {@inheritdoc}
+     * Class constructor
      *
-     * @param Cake\ViewView $view Instance of the cake view we are rendering this in
-     * @param string    $entityName Name of the entity this schema is for
+     * @param Neomerx\JsonApi\Contracts\Schema\ContainerInterface $factory ContainerInterface
+     * @param Neomerx\JsonApi\Contracts\Schema\SchemaFactoryInterface $container SchemaFactoryInterface
+     * @param Cake\View\View $view Instance of the cake view we are rendering this in
+     * @param string $entityName Name of the entity this schema is for
      */
-    public function __construct(SchemaFactoryInterface $factory, ContainerInterface $container, View $view, $entityName)
-    {
+    public function __construct(
+        SchemaFactoryInterface $factory,
+        ContainerInterface $container,
+        View $view,
+        $entityName
+    ) {
         $this->_view = $view;
 
         if (!$this->resourceType) {
@@ -40,18 +46,18 @@ class EntitySchema extends SchemaProvider
     }
 
     /**
-     * Use view helpers like it we normally would
+     * Magic accessor for helpers.
      *
-     * {@inheritdoc}
+     * @param string $name Name of the attribute to get.
+     * @return mixed
      */
-    public function __get($name) {
+    public function __get($name)
+    {
         return $this->_view->__get($name);
     }
 
     /**
-     * Try to set the correct id for the entity passed
-     *
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getId($resource)
     {
@@ -59,9 +65,7 @@ class EntitySchema extends SchemaProvider
     }
 
     /**
-     * Return all properties of the entity (except the id)
-     *
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getAttributes($resource)
     {

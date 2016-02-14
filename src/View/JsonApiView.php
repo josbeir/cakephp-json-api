@@ -77,6 +77,7 @@ class JsonApiView extends View
 
     /**
      * Map entities to schema files
+     *
      * @param  array  $entities An array of entity names that need to be mapped to a schema class
      *   If the schema class does not exist, the default EntitySchema will be used.
      * @return void
@@ -102,7 +103,7 @@ class JsonApiView extends View
                 $schemaClass = App::className('JsonApi.Entity', 'Schema', 'Schema');
             }
 
-            $schema = function($factory, $container) use ($schemaClass, $entityClassName) {
+            $schema = function ($factory, $container) use ($schemaClass, $entityClassName) {
                 return new $schemaClass($factory, $container, $this, $entityClassName);
             };
 
