@@ -25,23 +25,40 @@ The recommended way to install composer packages is:
 composer require josbeir/cakephp-json-api
 ```
 
-## Uage
+## Usage
 
 Load the plugin by adding it to your bootstrap.php
 
-```
+```php
 Plugin::load('JsonApi');
 ```
 
-Load the component to get going
+Load the component
 
-	$this->loadComponent('JsonApi.JsonApi', [
-	    'url' => Router::url('/api', true), // base url of the api
-	    'entities' => [ // entities that will be mapped to a schema
-	        'Client',
-	        'Credential'
-	    ]
-	]);
+```php
+$this->loadComponent('JsonApi.JsonApi', [
+    'url' => Router::url('/api', true), // base url of the api
+    'entities' => [ // entities that will be mapped to a schema
+        'Client',
+        'Credential'
+    ]
+]);
+```
+	
+In your controller action (trying to follow known cake concepts) we use **_serialize** to pass our results the **JsonApiView** class.
+
+```php
+public function index()
+{
+    $clients = $this->Articles->find()
+    	->all();
+
+    $this->set('_serialize', $clients);
+    
+    // optional
+    $this->set('_meta', ['some' => 'meta']);
+}
+```
 
 ## Configuration
 
@@ -53,85 +70,72 @@ Entities will be mapped to the ``EntitySchema`` base class. This class extends `
 
 The EntitySchema class has access the current view object which greatly increases possibilities inside your cake app (helpers, request, ...)
 
-It is recommended you create a schema for each entitity by extending the EntitySchema class.
+It is recommended you create a schema for each entity by extending the EntitySchema class.
 If you have an entity in '**Model\Entity\Author.php**' then create a schema in '**Schema\AuthorSchema.php**'
 
 ### Routing
 
 Cake's built in resource routing should work out of the box, a bit of fine tuning could be needed depending on the type of application you are working on.
 
-    $routes->scope('/api', function($routes) {
-        $routes->resources('Authors', function($routes) {
-            $routes->resources('Articles');
-        });
+```php
+$routes->scope('/api', function($routes) {
+    $routes->resources('Authors', function($routes) {
+        $routes->resources('Articles');
     });
+});
+```
 
 ### Schema example
 
 Example App\Schema\AuthorSchema.php (maps to App\Model\Entity\Author)
 
-	<?php
-	namespace TestApp\Schema;
+```php
+<?php
+namespace TestApp\Schema;
 
-	use JsonApi\Schema\EntitySchema;
+use JsonApi\Schema\EntitySchema;
 
-	class AuthorSchema extends EntitySchema
-	{
-	    public function getId($entity)
-	    {
-	        return $entity->get('id');
-	    }
+class AuthorSchema extends EntitySchema
+{
+    public function getId($entity)
+    {
+        return $entity->get('id');
+    }
 
-	    public function getAttributes($entity)
-	    {
-	        return [
-	            'title' => $entity->title,
-	            'body' => $entity->body,
-	            'published' => $entity->published,
-	            'helper_link' => $this->Url->buil(['action' => 'view']) // demonstrates helpers
-	        ];
-	    }
+    public function getAttributes($entity)
+    {
+        return [
+            'title' => $entity->title,
+            'body' => $entity->body,
+            'published' => $entity->published,
+            'helper_link' => $this->Url->build(['action' => 'view']) // view helper
+        ];
+    }
 
-	    public function getRelationships($entity, array $includeRelationships = [])
-	    {
-	        return [
-	            'articles' => [
-	                self::DATA => $entity->articles
-	            ]
-	        ];
-	    }
-	}
+    public function getRelationships($entity, array $includeRelationships = [])
+    {
+        return [
+            'articles' => [
+                self::DATA => $entity->articles
+            ]
+        ];
+    }
+}
+```
 
 Will output something like
 
-	{
-	    "data": [
-	        {
-	            "type": "authors",
-	            "id": "1",
-	            "attributes": {
-	                "title": null,
-	                "body": null,
-	                "published": null
-	            },
-	            "relationships": {
-	                "articles": {
-	                    "data": [
-	                        {
-	                            "type": "articles",
-	                            "id": "1"
-	                        },
-	                        {
-	                            "type": "articles",
-	                            "id": "3"
-	                        }
-	                    ]
-	                }
-	            },
-	            "links": {
-	                "self": "http:\/\/localhost\/authors\/1"
-	            }
-	        },
+```json
+{
+    "data": [
+        {
+            "type": "authors",
+            "id": "1",
+            "attributes": {
+                "title": null,
+                "body": null,
+                "published": null
+            },
 	...
 	...
-
+```
