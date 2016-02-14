@@ -1,0 +1,86 @@
+{
+    "data": [
+        {
+            "type": "authors",
+            "id": "1",
+            "attributes": {
+                "title": null,
+                "body": null,
+                "published": null
+            },
+            "relationships": {
+                "articles": {
+                    "data": [
+                        {
+                            "type": "articles",
+                            "id": "1"
+                        },
+                        {
+                            "type": "articles",
+                            "id": "3"
+                        }
+                    ]
+                }
+            },
+            "links": {
+                "self": "http:\/\/localhost\/authors\/1"
+            }
+        },
+        {
+            "type": "authors",
+            "id": "2",
+            "attributes": {
+                "title": null,
+                "body": null,
+                "published": null
+            },
+            "relationships": {
+                "articles": {
+                    "data": []
+                }
+            },
+            "links": {
+                "self": "http:\/\/localhost\/authors\/2"
+            }
+        },
+        {
+            "type": "authors",
+            "id": "3",
+            "attributes": {
+                "title": null,
+                "body": null,
+                "published": null
+            },
+            "relationships": {
+                "articles": {
+                    "data": [
+                        {
+                            "type": "articles",
+                            "id": "2"
+                        }
+                    ]
+                }
+            },
+            "links": {
+                "self": "http:\/\/localhost\/authors\/3"
+            }
+        },
+        {
+            "type": "authors",
+            "id": "4",
+            "attributes": {
+                "title": null,
+                "body": null,
+                "published": null
+            },
+            "relationships": {
+                "articles": {
+                    "data": []
+                }
+            },
+            "links": {
+                "self": "http:\/\/localhost\/authors\/4"
+            }
+        }
+    ]
+}

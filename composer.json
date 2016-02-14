@@ -1,0 +1,32 @@
+{
+    "name": "josbeir/cakephp-jsonapi",
+    "description": "JsonApi plugin for CakePHP - http://jsonapi.org/",
+    "type": "cakephp-plugin",
+    "keywords": [ "cakephp", "json", "jsonapi" ],
+    "authors": [
+        {
+            "name": "Jasper Smet",
+            "homepage": "https://github.com/josbeir/cakephp-jsonapi/graphs/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.16",
+        "cakephp/cakephp": "~3.0",
+        "neomerx/json-api": "^0.6.5"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "JsonApi\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "JsonApi\\Test\\": "tests",
+            "Cake\\Test\\": "./vendor/cakephp/cakephp/tests",
+            "TestApp\\": "tests/test_app/TestApp"
+        }
+    }
+}

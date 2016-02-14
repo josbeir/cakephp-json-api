@@ -1,0 +1,43 @@
+{
+    "data": [
+        {
+            "type": "articles",
+            "id": "1",
+            "attributes": {
+                "author_id": 1,
+                "title": "First Article",
+                "body": "First Article Body",
+                "published": "Y"
+            },
+            "links": {
+                "self": "http:\/\/localhost\/articles\/1"
+            }
+        },
+        {
+            "type": "articles",
+            "id": "2",
+            "attributes": {
+                "author_id": 3,
+                "title": "Second Article",
+                "body": "Second Article Body",
+                "published": "Y"
+            },
+            "links": {
+                "self": "http:\/\/localhost\/articles\/2"
+            }
+        },
+        {
+            "type": "articles",
+            "id": "3",
+            "attributes": {
+                "author_id": 1,
+                "title": "Third Article",
+                "body": "Third Article Body",
+                "published": "Y"
+            },
+            "links": {
+                "self": "http:\/\/localhost\/articles\/3"
+            }
+        }
+    ]
+}
