@@ -1,6 +1,6 @@
 {
-    "name": "josbeir/cakephp-jsonapi",
-    "description": "JsonApi plugin for CakePHP - http://jsonapi.org/",
+    "name": "josbeir/cakephp-json-api",
+    "description": "json-api specification plugin for CakePHP - http://jsonapi.org/",
     "type": "cakephp-plugin",
     "keywords": [ "cakephp", "json", "jsonapi" ],
     "authors": [

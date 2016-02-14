@@ -2,11 +2,11 @@
 
 ![json:api](http://jsonapi.org/images/jsonapi.png)
 
-This plugin implements [neomerx/json-api](https://github.com/neomerx/json-api) so it can be (quickly?) used in your cake application.
+This plugin implements [neomerx/json-api](https://github.com/neomerx/json-api) for cakephp3
 
 ## Disclaimer
 
-Very much a work in progress. My goal is make it as feature complete as possible but contributions are welcome. 
+Very much a work in progress. My goal is make it as feature complete as possible but contributions are welcome.
 
 ## Installation
 
@@ -15,7 +15,7 @@ You can install this plugin into your CakePHP application using [composer](http:
 The recommended way to install composer packages is:
 
 ```
-composer require josbeir/cakephp-jsonapi
+composer require josbeir/cakephp-json-api
 ```
 
 ## Uage
@@ -65,16 +65,16 @@ Example App\Schema\AuthorSchema.php (maps to App\Model\Entity\Author)
 
 	<?php
 	namespace TestApp\Schema;
-	
+
 	use JsonApi\Schema\EntitySchema;
-	
+
 	class AuthorSchema extends EntitySchema
 	{
 	    public function getId($entity)
 	    {
 	        return $entity->get('id');
 	    }
-	
+
 	    public function getAttributes($entity)
 	    {
 	        return [
@@ -84,7 +84,7 @@ Example App\Schema\AuthorSchema.php (maps to App\Model\Entity\Author)
 	            'helper_link' => $this->Url->buil(['action' => 'view']) // demonstrates helpers
 	        ];
 	    }
-	
+
 	    public function getRelationships($entity, array $includeRelationships = [])
 	    {
 	        return [
@@ -127,4 +127,4 @@ Will output something like
 	        },
 	...
 	...
-	
+
