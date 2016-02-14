@@ -3,12 +3,17 @@
     "description": "json-api specification plugin for CakePHP - http://jsonapi.org/",
     "type": "cakephp-plugin",
     "keywords": [ "cakephp", "json", "jsonapi" ],
+    "license": "MIT",
     "authors": [
         {
             "name": "Jasper Smet",
             "homepage": "https://github.com/josbeir/cakephp-jsonapi/graphs/contributors"
         }
     ],
+    "support": {
+        "issues": "https://github.com/josbeir/cakephp-json-api/issues",
+        "source": "https://github.com/josbeir/cakephp-json-api"
+    },
     "require": {
         "php": ">=5.4.16",
         "cakephp/cakephp": "~3.0",

@@ -1,5 +1,8 @@
 # json-api plugin for CakePHP 3
 
+[![Latest Stable Version](https://poser.pugx.org/josbeir/cakephp-json-api/v/stable)](https://packagist.org/packages/josbeir/cakephp-json-api) [![Total Downloads](https://poser.pugx.org/josbeir/cakephp-json-api/downloads)](https://packagist.org/packages/josbeir/cakephp-json-api) [![Latest Unstable Version](https://poser.pugx.org/josbeir/cakephp-json-api/v/unstable)](https://packagist.org/packages/josbeir/cakephp-json-api) [![License](https://poser.pugx.org/josbeir/cakephp-json-api/license)](https://packagist.org/packages/josbeir/cakephp-json-api)
+
+
 ![json:api](http://jsonapi.org/images/jsonapi.png)
 
 This plugin implements [neomerx/json-api](https://github.com/neomerx/json-api) for cakephp3
