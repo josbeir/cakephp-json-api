@@ -3,6 +3,8 @@ namespace JsonApi\Controller\Component;
 
 use Cake\Controller\Component;
 use Cake\Controller\ComponentRegistry;
+use Cake\Core\Configure;
+use Cake\Event\Event;
 
 /**
  * JsonApi component
@@ -16,23 +18,41 @@ class JsonApiComponent extends Component
      */
     protected $_defaultConfig = [
         'url' => null,
-        'schemas' => [],
         'entities' => [],
         'meta' => []
+    ];
+
+    public $components = [
+        'RequestHandler'
     ];
 
     /**
      * Initialize config data and properties.
      *
-     * @param array $config The config data.
+     * @param  Event  $event [description]
      * @return void
      */
-    public function initialize(array $config)
+    public function startup(Event $event)
     {
-        $controller = $this->_registry->getController();
+        $this->RequestHandler->config('viewClassMap', [
+            'jsonapi' => 'JsonApi.JsonApi'
+        ]);
+    }
 
-        $builder = $controller->viewBuilder();
-        $builder->className('JsonApi\View\JsonApiView');
-        $builder->options($this->config());
+    /**
+     * Render the current request as a proper jsonapi response
+     *
+     * @param  Event  $event Current event_add(event)
+     * @return void
+     */
+    public function beforeRender(Event $event)
+    {
+        $controller = $event->subject();
+
+        $controller
+            ->viewBuilder()
+            ->options($this->config());
+
+        $this->RequestHandler->renderAs($controller, 'jsonapi');
     }
 }

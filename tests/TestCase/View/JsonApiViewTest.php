@@ -115,4 +115,9 @@ class JsonApiViewTest extends TestCase
 
         $this->assertSame('application/vnd.api+json', $view->response->type());
     }
+
+    public function testEntitiesToSchema()
+    {
+        $view = $this->_getView();
+    }
 }

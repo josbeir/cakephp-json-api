@@ -15,14 +15,6 @@ use Neomerx\JsonApi\Encoder\EncoderOptions;
 class JsonApiView extends View
 {
     /**
-     * json-api spec 1.0 requires all request to response (and accept)
-     * application/vnd.api+json
-     *
-     * @var string
-     */
-    public $responseType = 'application/vnd.api+json';
-
-    /**
      * [$_prefixUrl description]
      * @var null
      */
@@ -56,8 +48,9 @@ class JsonApiView extends View
     ) {
         parent::__construct($request, $response, $eventManager, $viewOptions);
 
-        // set proper json-api response type
-        $response->type($this->responseType);
+        if ($response && $response instanceof Response) {
+            $response->type('jsonapi');
+        }
 
         // configure the json-api schema mapping
         if (isset($viewOptions['entities'])) {
@@ -77,7 +70,6 @@ class JsonApiView extends View
 
     /**
      * Map entities to schema files
-     *
      * @param  array  $entities An array of entity names that need to be mapped to a schema class
      *   If the schema class does not exist, the default EntitySchema will be used.
      * @return void
