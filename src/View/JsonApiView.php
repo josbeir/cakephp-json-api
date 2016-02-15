@@ -11,6 +11,7 @@ use Cake\Routing\Router;
 use Cake\View\View;
 use Neomerx\JsonApi\Encoder\Encoder;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
+use Neomerx\JsonApi\Parameters\EncodingParameters;
 
 class JsonApiView extends View
 {
@@ -130,18 +131,61 @@ class JsonApiView extends View
      * Serialize view vars
      *
      * ### Special parameters
-     * `_jsonOptions` You can set custom options for json_encode() this way,
-     *   e.g. `JSON_HEX_TAG | JSON_HEX_APOS`.
+     * `_serialize` This holds the actual data to pass to the encoder
+     * `_include` An array of hash paths of what should be in the 'included' section of the response
+     *   see: http://jsonapi.org/format/#fetching-includes
+     *   eg: [ 'posts.author' ]
+     * `_fieldsets` A hash path of fields a list of names that should be in the resultset
+     *   eg: [ 'sites'  => ['name'], 'people' => ['first_name'] ]
      *
      * @param mixed $serialize The data that needs to be encoded using the JsonApi encoder
      * @return string The serialized data
      */
     protected function _serialize($serialize)
     {
-        if (isset($this->viewVars['_meta'])) {
-            $this->_meta = array_merge($this->_meta, $this->viewVars['_meta']);
+        $jsonOptions = $this->_jsonOptions();
+
+        $encoderOptions = new EncoderOptions($jsonOptions, rtrim($this->_prefixUrl, '/'));
+        $encoder = Encoder::instance($this->_schemas, $encoderOptions);
+
+        $parameters = $include = $fieldsets = null;
+        if (isset($this->viewVars['_include'])) {
+            $include = $this->viewVars['_include'];
         }
 
+        if (isset($this->viewVars['_fieldsets'])) {
+            $fieldsets = $this->viewVars['_fieldsets'];
+        }
+
+        $meta = $this->_meta;
+        if (isset($this->viewVars['_meta'])) {
+            $meta = array_merge($this->_meta, $this->viewVars['_meta']);
+        }
+
+        if ($meta) {
+            $encoder->withMeta($meta);
+        }
+
+        if (empty($serialize)) {
+            return $encoder->encodeMeta($meta);
+        }
+
+        $parameters = new EncodingParameters($include, $fieldsets);
+
+        return $encoder->encodeData($serialize, $parameters);
+    }
+
+    /**
+     * Return json options
+     *
+     * ### Special parameters
+     * `_jsonOptions` You can set custom options for json_encode() this way,
+     *   e.g. `JSON_HEX_TAG | JSON_HEX_APOS`.
+     *
+     * @return int json option constant
+     */
+    protected function _jsonOptions()
+    {
         $jsonOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
         if (isset($this->viewVars['_jsonOptions'])) {
             if ($this->viewVars['_jsonOptions'] === false) {
@@ -155,15 +199,6 @@ class JsonApiView extends View
             $jsonOptions = $jsonOptions | JSON_PRETTY_PRINT;
         }
 
-        $encoder = Encoder::instance(
-            $this->_schemas,
-            new EncoderOptions($jsonOptions, rtrim($this->_prefixUrl, '/'))
-        );
-
-        if ($this->_meta) {
-            $encoder->withMeta($this->_meta);
-        }
-
-        return $encoder->encodeData($serialize);
+        return $jsonOptions;
     }
 }

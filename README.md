@@ -50,13 +50,15 @@ In your controller action (trying to follow known cake concepts) we use **_seria
 ```php
 public function index()
 {
-    $clients = $this->Articles->find()
-    	->all();
-
-    $this->set('_serialize', $clients);
-    
-    // optional
-    $this->set('_meta', ['some' => 'meta']);
+	$clients = $this->Articles->find()
+		->all();
+		
+	$this->set('_serialize', $clients);
+	    
+	// optional
+	$this->set('_meta', ['some' => 'meta']);
+	$this->set('_include', [ 'articles', 'articles.comments' ]);
+	$this->set('_fieldsets', [ 'articles' => [ 'title' ] ]);
 }
 ```
 

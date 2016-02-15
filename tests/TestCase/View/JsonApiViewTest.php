@@ -116,8 +116,62 @@ class JsonApiViewTest extends TestCase
         $this->assertSame('application/vnd.api+json', $view->response->type());
     }
 
-    public function testEntitiesToSchema()
+    /**
+     * Test Render
+     * @return [type] [description]
+     */
+    public function testEncodeWithIncludeAndFieldSet()
     {
-        $view = $this->_getView();
+        $records = TableRegistry::get('Authors')->find()
+            ->contain(['Articles'])
+            ->all();
+
+        $viewOptions = [
+            'url' => 'http://localhost',
+            'entities' => [
+                'Author',
+                'Article'
+            ]
+        ];
+
+        $view = $this->_getView($viewOptions, [
+            '_serialize' => $records,
+            '_include' => [ 'articles' ],
+            '_fieldsets' => [ 'articles' => [ 'title' ] ]
+        ]);
+
+        $output = $view->render();
+        $output = json_decode($output, true);
+
+        $expectedSubset = [
+            'included' => [
+                [
+                    'type' => 'articles',
+                    'id' => '1',
+                    'attributes' => [
+                        'title' => 'First Article'
+                    ]
+                ]
+            ]
+        ];
+
+        $this->assertArraySubset($expectedSubset, $output);
+    }
+
+    public function testOnlyMetaData()
+    {
+        $meta = [ 'meta' => 'data' ];
+        $viewOptions = [
+            'url' => 'http://localhost',
+            'entities' => [
+                'Article'
+            ]
+        ];
+        $view = $this->_getView($viewOptions, [
+            '_meta' => $meta
+        ]);
+
+        $output = $view->render();
+        $this->assertEquals(['meta' => $meta ], json_decode($output, true));
     }
 }

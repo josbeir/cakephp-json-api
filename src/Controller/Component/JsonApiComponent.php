@@ -22,6 +22,9 @@ class JsonApiComponent extends Component
         'meta' => []
     ];
 
+    /**
+     * {@inheritDoc}
+     */
     public $components = [
         'RequestHandler'
     ];
