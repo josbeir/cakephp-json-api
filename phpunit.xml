@@ -38,11 +38,8 @@
             <directory suffix=".php">./tests/</directory>
             <directory suffix=".ctp">./tests/</directory>
         </blacklist>
-        <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">./tests/</directory>
-            <exclude>
-                <directory suffix=".php">./tests/test_app</directory>
-            </exclude>
+        <whitelist>
+            <directory suffix=".php">./src/</directory>
         </whitelist>
     </filter>
 
