@@ -9,11 +9,18 @@
 
 ![json:api](http://jsonapi.org/images/jsonapi.png)
 
-This plugin implements [neomerx/json-api](https://github.com/neomerx/json-api) for cakephp3
+This plugin implements [neomerx/json-api](https://github.com/neomerx/json-api) for cakephp3.
+
+> JSON API is a specification for how a client should request that resources be fetched or modified, and how a server should respond to those requests.
+> 
+> JSON API is designed to minimize both the number of requests and the amount of data transmitted between clients and servers. This efficiency is achieved without compromising readability, flexibility, or discoverability.
+> 
+> JSON API requires use of the JSON API media type (application/vnd.api+json) for exchanging data.
+
 
 ## Disclaimer
 
-Very much a work in progress. My goal is make it as feature complete as possible but contributions are welcome.
+Very much a work in progress. My goal is make it as feature complete as possible but contributions are welcome. Features are added on an occasional basis. 
 
 ## Installation
 
@@ -37,15 +44,17 @@ Load the component
 
 ```php
 $this->loadComponent('JsonApi.JsonApi', [
-    'url' => Router::url('/api', true), // base url of the api
-    'entities' => [ // entities that will be mapped to a schema
-        'Client',
-        'Credential'
-    ]
+	'meta' => [], // global meta
+	'links' => [], // global links
+	'url' => Router::url('/api', true), // base url of the api
+	'entities' => [ // entities that will be mapped to a schema
+		'Client',
+		'Credential'
+	]
 ]);
 ```
 	
-In your controller action (trying to follow known cake concepts) we use **_serialize** to pass our results the **JsonApiView** class.
+In your controller action (trying to follow known cake concepts) we use **_serialize** to pass our results the **JsonApiView** class (this is where most of the magic happens).
 
 ```php
 public function index()
@@ -55,10 +64,16 @@ public function index()
 		
 	$this->set('_serialize', $clients);
 	    
-	// optional
+	// optional parameters
 	$this->set('_meta', ['some' => 'meta']);
 	$this->set('_include', [ 'articles', 'articles.comments' ]);
 	$this->set('_fieldsets', [ 'articles' => [ 'title' ] ]);
+	$this->set('_links', [
+		Link::FIRST => new Link('/authors?page=1'),
+		Link::LAST => new Link('/authors?page=9', [
+			'meta' => 'data'
+		])
+	]);
 }
 ```
 
@@ -66,14 +81,19 @@ public function index()
 
 This plugin works by using [neomerx/json-api](https://github.com/neomerx/json-api) php module at its core, my advice is to read up on the docs before proceeding.
 
-Instead of configuring the whole mapping by hand the only thing that is required to get you going is to define the **entities** array when loading the component.
+Instead of configuring the whole mapping by hand the only thing that is required to get going is to define your entity names in the **entities** array when loading the component.
 
 Entities will be mapped to the ``EntitySchema`` base class. This class extends `Neomerx\JsonApi\Schema\SchemaProvider`.
 
-The EntitySchema class has access the current view object which greatly increases possibilities inside your cake app (helpers, request, ...)
+It is recommended that you create a schema for each entity by extending the EntitySchema class. If you have an entity in '**Model\Entity\Author.php**' then you need to create a schema in '**Schema\AuthorSchema.php**'
 
-It is recommended you create a schema for each entity by extending the EntitySchema class.
-If you have an entity in '**Model\Entity\Author.php**' then create a schema in '**Schema\AuthorSchema.php**'
+### Views and schemas
+
+My vision of the Schema file implementation in cakephp is that it should be some kind of cross breed between entities and view templates. Because of this, most of the magic happens in the ViewClass instead of a let's say a component.
+
+Because of this the View class is available inside your Schema and the cakephp helpers, request, response, ... can be accessed accordingly should you need it.
+
+```$this->getView()``` can be called from inside the schema and returns the current view.
 
 ### Routing
 
@@ -141,3 +161,8 @@ Will output something like
 	...
 	...
 ```
+
+## Todo
+
+* Still very much :-)
+* Implement a custom resource routing class
