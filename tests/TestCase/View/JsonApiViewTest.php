@@ -58,13 +58,10 @@ class JsonApiViewTest extends TestCase
             '_serialize' => $records
         ]);
 
-        $output = $view->render();
-        $output = json_decode($output);
-
-        $expected = file_get_contents(ROOT . DS . 'tests' . DS . 'Fixture' . DS . 'articles.json');
-        $expected = json_decode($expected);
-
-        $this->assertEquals($expected, $output);
+        $this->assertJsonStringEqualsJsonFile(
+            ROOT . DS . 'tests' . DS . 'Fixture' . DS . 'articles.json',
+            $view->render()
+        );
     }
 
     /**
@@ -89,13 +86,10 @@ class JsonApiViewTest extends TestCase
             '_serialize' => $records
         ]);
 
-        $output = $view->render();
-        $output = json_decode($output);
-
-        $expected = file_get_contents(ROOT . DS . 'tests' . DS . 'Fixture' . DS . 'authors.json');
-        $expected = json_decode($expected);
-
-        $this->assertEquals($expected, $output);
+        $this->assertJsonStringEqualsJsonFile(
+            ROOT . DS . 'tests' . DS . 'Fixture' . DS . 'authors.json',
+            $view->render()
+        );
     }
 
     public function testViewResponse()
@@ -212,5 +206,29 @@ class JsonApiViewTest extends TestCase
         ];
 
         $this->assertArraySubset(['links' => $expected], $output);
+    }
+
+    public function testJsonOptions()
+    {
+        $view = $this->_getView([], [
+            '_jsonOptions' => JSON_HEX_QUOT
+        ]);
+
+        $output = $view->render();
+        $this->assertEquals(8, $view->viewVars['_jsonOptions']);
+
+        $view = $this->_getView([], [
+            '_jsonOptions' => false
+        ]);
+
+        $this->assertEquals(0, $view->viewVars['_jsonOptions']);
+    }
+
+    public function testEmptyView()
+    {
+        $view = $this->_getView();
+        $output = $view->render();
+
+        $this->assertEquals(['data' => null], json_decode($output, true));
     }
 }

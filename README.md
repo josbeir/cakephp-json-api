@@ -12,15 +12,15 @@
 This plugin implements [neomerx/json-api](https://github.com/neomerx/json-api) for cakephp3.
 
 > JSON API is a specification for how a client should request that resources be fetched or modified, and how a server should respond to those requests.
-> 
+>
 > JSON API is designed to minimize both the number of requests and the amount of data transmitted between clients and servers. This efficiency is achieved without compromising readability, flexibility, or discoverability.
-> 
+>
 > JSON API requires use of the JSON API media type (application/vnd.api+json) for exchanging data.
 
 
 ## Disclaimer
 
-Very much a work in progress. My goal is make it as feature complete as possible but contributions are welcome. Features are added on an occasional basis. 
+Very much a work in progress. My goal is make it as feature complete as possible but contributions are welcome. Features are added on an occasional basis.
 
 ## Installation
 
@@ -48,12 +48,12 @@ $this->loadComponent('JsonApi.JsonApi', [
 	'links' => [], // global links
 	'url' => Router::url('/api', true), // base url of the api
 	'entities' => [ // entities that will be mapped to a schema
-		'Client',
-		'Credential'
+		'Article',
+		'Author'
 	]
 ]);
 ```
-	
+
 In your controller action (trying to follow known cake concepts) we use **_serialize** to pass our results the **JsonApiView** class (this is where most of the magic happens).
 
 ```php
@@ -61,9 +61,9 @@ public function index()
 {
 	$clients = $this->Articles->find()
 		->all();
-		
+
 	$this->set('_serialize', $clients);
-	    
+
 	// optional parameters
 	$this->set('_meta', ['some' => 'meta']);
 	$this->set('_include', [ 'articles', 'articles.comments' ]);
@@ -85,13 +85,13 @@ Instead of configuring the whole mapping by hand the only thing that is required
 
 Entities will be mapped to the ``EntitySchema`` base class. This class extends `Neomerx\JsonApi\Schema\SchemaProvider`.
 
-It is recommended that you create a schema for each entity by extending the EntitySchema class. If you have an entity in '**Model\Entity\Author.php**' then you need to create a schema in '**Schema\AuthorSchema.php**'
+It is recommended that you create a schema for each entity by extending the EntitySchema class. If you have an entity in ``Model\Entity\Author`` then you need to create a schema in ``View\Schema\AuthorSchema``
 
-### Views and schemas
+### Views and schema's
 
-My vision of the Schema file implementation in cakephp is that it should be some kind of cross breed between entities and view templates. Because of this, most of the magic happens in the ViewClass instead of a let's say a component.
+Think of the schema as a template that represents an entity. Because of this it is possible to get access to the current view object, helpers are also available using the views magic accessors just like you would expect in normal templates.
 
-```$this->getView()``` can be called from inside the schema.
+```$this->getView()``` can be called inside the schema if you want to do some fancy view stuff.
 
 ### Routing
 
@@ -107,7 +107,7 @@ $routes->scope('/api', function($routes) {
 
 ### Schema example
 
-Example App\Schema\AuthorSchema.php (maps to App\Model\Entity\Author)
+Example App\View\Schema\AuthorSchema.php (maps to App\Model\Entity\Author)
 
 ```php
 <?php
@@ -158,9 +158,10 @@ Will output something like
             },
 	...
 	...
+
 ```
 
 ## Todo
 
-* Still very much :-)
 * Implement a custom resource routing class
+* Component option to automatically add pagination metadata

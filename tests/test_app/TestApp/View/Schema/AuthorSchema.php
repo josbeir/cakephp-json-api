@@ -1,7 +1,7 @@
 <?php
-namespace TestApp\Schema;
+namespace TestApp\View\Schema;
 
-use JsonApi\Schema\EntitySchema;
+use JsonApi\View\Schema\EntitySchema;
 
 class AuthorSchema extends EntitySchema
 {

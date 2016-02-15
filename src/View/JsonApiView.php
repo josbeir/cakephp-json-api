@@ -97,10 +97,10 @@ class JsonApiView extends View
                 throw new MissingEntityException([$entityName]);
             }
 
-            $schemaClass = App::className($entityName, 'Schema', 'Schema');
+            $schemaClass = App::className($entityName, 'View\Schema', 'Schema');
 
             if (!$schemaClass) {
-                $schemaClass = App::className('JsonApi.Entity', 'Schema', 'Schema');
+                $schemaClass = App::className('JsonApi.Entity', 'View\Schema', 'Schema');
             }
 
             $schema = function ($factory, $container) use ($schemaClass, $entityName) {
@@ -173,11 +173,10 @@ class JsonApiView extends View
         }
 
         if ($meta) {
+            if (empty($serialize)) {
+                return $encoder->encodeMeta($meta);
+            }
             $encoder->withMeta($meta);
-        }
-
-        if (empty($serialize)) {
-            return $encoder->encodeMeta($meta);
         }
 
         $parameters = new EncodingParameters($include, $fieldsets);

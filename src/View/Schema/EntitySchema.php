@@ -1,5 +1,5 @@
 <?php
-namespace JsonApi\Schema;
+namespace JsonApi\View\Schema;
 
 use Cake\ORM\Entity;
 use Cake\Utility\Inflector;
