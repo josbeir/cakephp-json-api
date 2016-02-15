@@ -134,7 +134,8 @@ class JsonApiView extends View
      * ]);
      * ```
      *
-     * @param mixed $serialize The data that needs to be encoded using the JsonApi encoder
+     * @param string|null $view Name of view file to use
+     * @param string|null $layout Layout to use.
      * @return string The serialized data
      */
     public function render($view = null, $layout = null)
