@@ -2,12 +2,11 @@
 namespace JsonApi\Test\TestCase\View;
 
 use Cake\Controller\Controller;
-use Cake\Core\App;
-use Cake\Core\Configure;
 use Cake\Network\Request;
 use Cake\Network\Response;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
+use Neomerx\JsonApi\Schema\Link;
 
 class JsonApiViewTest extends TestCase
 {
@@ -173,5 +172,45 @@ class JsonApiViewTest extends TestCase
 
         $output = $view->render();
         $this->assertEquals(['meta' => $meta ], json_decode($output, true));
+    }
+
+
+    public function testResponseWithLinks()
+    {
+        $records = TableRegistry::get('Articles')->find()->all();
+        $viewOptions = [
+            'url' => 'http://localhost',
+            'entities' => [
+                'Article'
+            ]
+        ];
+
+        $view = $this->_getView($viewOptions, [
+            '_serialize' => $records,
+            '_links' => [
+                Link::FIRST => new Link('/authors?page=1'),
+                Link::LAST => new Link('/authors?page=4'),
+                Link::NEXT => new Link('/authors?page=6'),
+                Link::LAST => new Link('/authors?page=9', [
+                    'meta' => 'data'
+                ])
+            ]
+        ]);
+
+        $output = $view->render();
+        $output = json_decode($output, true);
+
+        $expected = [
+            'first' => 'http://localhost/authors?page=1',
+            'last' => [
+                'href' => 'http://localhost/authors?page=9',
+                'meta' => [
+                    'meta' => 'data'
+                ]
+            ],
+            'next' => 'http://localhost/authors?page=6'
+        ];
+
+        $this->assertArraySubset(['links' => $expected], $output);
     }
 }

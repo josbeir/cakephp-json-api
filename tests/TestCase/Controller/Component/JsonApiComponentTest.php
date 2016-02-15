@@ -3,10 +3,8 @@ namespace JsonApi\Test\TestCase\Controller\Component;
 
 use Cake\Controller\ComponentRegistry;
 use Cake\Controller\Controller;
-use Cake\Core\Configure;
 use Cake\Event\Event;
 use Cake\Network\Request;
-use Cake\Network\Response;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 use JsonApi\Controller\Component\JsonApiComponent;
@@ -65,7 +63,8 @@ class JsonApiComponentTest extends TestCase
             'entities' => [
                 'Article'
             ],
-            'meta' => []
+            'meta' => [],
+            'links' => []
         ];
 
         $this->JsonApi->beforeRender(new Event('Controller.beforeRender', $this->Controller));
@@ -84,7 +83,8 @@ class JsonApiComponentTest extends TestCase
         $settings = [
             'url' => 'http://localhost/',
             'entities' => [ 'Test' ],
-            'meta' => [ 'hello' => 'world' ]
+            'meta' => [ 'hello' => 'world' ],
+            'links' => []
         ];
 
         $JsonApi = new JsonApiComponent($this->Registry, $settings);
@@ -92,6 +92,7 @@ class JsonApiComponentTest extends TestCase
         $this->assertEquals($JsonApi->config('meta'), $settings['meta']);
         $this->assertEquals($JsonApi->config('url'), $settings['url']);
         $this->assertEquals($JsonApi->config('entities'), $settings['entities']);
+        $this->assertEquals($JsonApi->config('links'), $settings['links']);
     }
 
     public function testControllerResponseType()

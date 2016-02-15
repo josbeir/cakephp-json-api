@@ -12,14 +12,18 @@ use Cake\Event\Event;
 class JsonApiComponent extends Component
 {
     /**
-     * Default configuration.
-     *
+     * Default config
+     * - `url` - The base url of the api
+     * - `entites` - List of entities that should be included in the mapping
+     * - `meta` - Links that should be passed to Encoder::withMeta
+     * - `links` - Links that should be passed to Encoder::withLinks
      * @var array
      */
     protected $_defaultConfig = [
         'url' => null,
         'entities' => [],
-        'meta' => []
+        'meta' => [],
+        'links' => []
     ];
 
     /**
