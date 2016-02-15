@@ -214,13 +214,14 @@ class JsonApiViewTest extends TestCase
             '_jsonOptions' => JSON_HEX_QUOT
         ]);
 
-        $output = $view->render();
+        $view->render();
         $this->assertEquals(8, $view->viewVars['_jsonOptions']);
 
         $view = $this->_getView([], [
             '_jsonOptions' => false
         ]);
 
+        $view->render();
         $this->assertEquals(0, $view->viewVars['_jsonOptions']);
     }
 
@@ -230,5 +231,16 @@ class JsonApiViewTest extends TestCase
         $output = $view->render();
 
         $this->assertEquals(['data' => null], json_decode($output, true));
+    }
+
+    public function testEntityNotFoundException()
+    {
+        $this->setExpectedException('Cake\ORM\Exception\MissingEntityException');
+
+        $view = $this->_getView([
+            'entities' => [ 'FakeEntity' ]
+        ]);
+
+        $output = $view->render();
     }
 }

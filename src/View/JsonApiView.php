@@ -62,7 +62,7 @@ class JsonApiView extends View
 
         // configure the json-api schema mapping
         if (isset($viewOptions['entities'])) {
-            $this->entitiesToSchema($viewOptions['entities']);
+            $this->_entitiesToSchema($viewOptions['entities']);
         }
 
         // set the base url for the api
@@ -86,7 +86,7 @@ class JsonApiView extends View
      *   If the schema class does not exist, the default EntitySchema will be used.
      * @return void
      */
-    protected function entitiesToSchema(array $entities)
+    protected function _entitiesToSchema(array $entities)
     {
         $entities = Hash::normalize($entities);
         foreach ($entities as $entityName => $options) {
