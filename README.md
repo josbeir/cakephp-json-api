@@ -91,9 +91,7 @@ It is recommended that you create a schema for each entity by extending the Enti
 
 My vision of the Schema file implementation in cakephp is that it should be some kind of cross breed between entities and view templates. Because of this, most of the magic happens in the ViewClass instead of a let's say a component.
 
-Because of this the View class is available inside your Schema and the cakephp helpers, request, response, ... can be accessed accordingly should you need it.
-
-```$this->getView()``` can be called from inside the schema and returns the current view.
+```$this->getView()``` can be called from inside the schema.
 
 ### Routing
 
