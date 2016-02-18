@@ -41,7 +41,7 @@ Load the plugin by adding it to your bootstrap.php
 Plugin::load('JsonApi');
 ```
 
-or
+or activate it using the cake shell
 
 ```
 $ bin/cake plugin load JsonApi
@@ -53,18 +53,17 @@ Then tell your controller to use the JsonApi view
 $this->viewBuilder()->className('JsonApi.JsonApi');
 ```
 
-We use **_serialize** to pass results the **JsonApiView** class (this is where most of the magic happens).
+The following view variables can be assigned in your controller
 
-The following variables can be assigned in your controller
-
-* `_serialize` This holds the actual data to pass to the encoder
-* `_url` The base url of the api endpoint
+* `_serialize` this holds the actual data to pass to the encoder instance, can be an array of entities, a single entity.
+* `_url` the base url of the api endpoint
 * `_entities` **required** A list of entities that are going to be mapped to Schemas
-* `_include` An array of hash paths of what should be in the [included](http://jsonapi.org/format/#fetching-includes) section of the response.
-	`[ 'posts.author' ]`
-* `_fieldsets` A hash path of fields a list of names that should be in the resultset 	``[ 'sites'  => ['name'], 'people' => ['first_name'] ]```
-* `_meta` Metadata to add to the document
-* `_links` Links to add to the document this should be an array of ``Neomerx\JsonApi\Schema\Link`` objects.
+* `_include` an array of hash paths what should be in the [included](http://jsonapi.org/format/#fetching-includes) section of the response.
+    `[ 'posts.author', 'comments' ]`
+* `_fieldsets` A hash path of fields should be in the resultset
+    `[ 'sites'  => ['name'], 'people' => ['first_name'] ]`
+* `_meta` meta data to add to the document
+* `_links` links to add to the document this should be an array of ``Neomerx\JsonApi\Schema\Link`` objects.
 	
 	```php
 	$this->set('_links', [
@@ -81,11 +80,19 @@ The following variables can be assigned in your controller
 public function initialize()
 {
 	$this->viewBuilder()->className('JsonApi.JsonApi');
-	
-	$this->set('_url', Router::url('/api', true));
+
 	$this->set('_entities', [
 		'Article',
 		'Author'
+	]);
+	
+	$this->set('_url', Router::url('/api', true));
+	$this->set('_meta', ['some' => 'global metadata']);
+	$this->set('_links', [ // uses Neomerx\JsonApi\Schema\Link
+		Link::FIRST => new Link('/authors?page=1'),
+		Link::LAST => new Link('/authors?page=9', [
+			'meta' => 'data'
+		])
 	]);
 }
 
@@ -97,15 +104,8 @@ public function index()
 	$this->set('_serialize', $clients);
 
 	// optional parameters
-	$this->set('_meta', ['some' => 'meta']);
 	$this->set('_include', [ 'articles', 'articles.comments' ]);
 	$this->set('_fieldsets', [ 'articles' => [ 'title' ] ]);
-	$this->set('_links', [
-		Link::FIRST => new Link('/authors?page=1'),
-		Link::LAST => new Link('/authors?page=9', [
-			'meta' => 'data'
-		])
-	]);
 }
 ```
 
