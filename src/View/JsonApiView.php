@@ -17,30 +17,6 @@ use Neomerx\JsonApi\Schema\Link;
 class JsonApiView extends View
 {
     /**
-     * [$_prefixUrl description]
-     * @var null
-     */
-    protected $_prefixUrl = null;
-
-    /**
-     * [$_schemas description]
-     * @var array
-     */
-    protected $_schemas = [];
-
-    /**
-     * Hold global meta data
-     * @var array
-     */
-    protected $_meta = [];
-
-    /**
-     * Hold global links
-     * @var array
-     */
-    protected $_links = [];
-
-    /**
      * Constructor
      *
      * @param \Cake\Network\Request $request Request instance.
@@ -59,35 +35,18 @@ class JsonApiView extends View
         if ($response && $response instanceof Response) {
             $response->type('jsonapi');
         }
-
-        // configure the json-api schema mapping
-        if (isset($viewOptions['entities'])) {
-            $this->_entitiesToSchema($viewOptions['entities']);
-        }
-
-        // set the base url for the api
-        if (isset($viewOptions['url'])) {
-            $this->_prefixUrl = $viewOptions['url'];
-        }
-
-        // add metadata to the api response
-        if (isset($viewOptions['meta'])) {
-            $this->_meta = $viewOptions['meta'];
-        }
-
-        if (isset($viewOptions['links'])) {
-            $this->_links = $viewOptions['links'];
-        }
     }
 
     /**
      * Map entities to schema files
      * @param  array  $entities An array of entity names that need to be mapped to a schema class
      *   If the schema class does not exist, the default EntitySchema will be used.
-     * @return void
+     *
+     * @return array A list of Entity class names as its key and a closure returning the schema class
      */
     protected function _entitiesToSchema(array $entities)
     {
+        $schemas = [];
         $entities = Hash::normalize($entities);
         foreach ($entities as $entityName => $options) {
 
@@ -107,8 +66,10 @@ class JsonApiView extends View
                 return new $schemaClass($factory, $container, $this, $entityName);
             };
 
-            $this->_schemas[$entityclass] = $schema;
+            $schemas[$entityclass] = $schema;
         }
+
+        return $schemas;
     }
 
     /**
@@ -116,8 +77,10 @@ class JsonApiView extends View
      *
      * ### Special parameters
      * `_serialize` This holds the actual data to pass to the encoder
-     * `_include` An array of hash paths of what should be in the 'included' section of the response
-     *   see: http://jsonapi.org/format/#fetching-includes
+     * `_url` The base url of the api endpoint
+     * `_entities` A list of entitites that are going to be mapped to Schemas
+     * `_include` An array of hash paths of what should be in the 'included'
+     *   section of the response. see: http://jsonapi.org/format/#fetching-includes
      *   eg: [ 'posts.author' ]
      * `_fieldsets` A hash path of fields a list of names that should be in the resultset
      *   eg: [ 'sites'  => ['name'], 'people' => ['first_name'] ]
@@ -140,14 +103,16 @@ class JsonApiView extends View
      */
     public function render($view = null, $layout = null)
     {
-        $parameters = $include = $fieldsets = $serialize = null;
-
+        $include = $fieldsets = $schemas = $links = $meta = [];
+        $parameters = $serialize = $url = null;
         $jsonOptions = $this->_jsonOptions();
-        $encoderOptions = new EncoderOptions($jsonOptions, rtrim($this->_prefixUrl, '/'));
-        $encoder = Encoder::instance($this->_schemas, $encoderOptions);
 
-        if (isset($this->viewVars['_serialize'])) {
-            $serialize = $this->viewVars['_serialize'];
+        if (isset($this->viewVars['_url'])) {
+            $url = rtrim($this->viewVars['_url'], '/');
+        }
+
+        if (isset($this->viewVars['_entities'])) {
+            $schemas = $this->_entitiesToSchema($this->viewVars['_entities']);
         }
 
         if (isset($this->viewVars['_include'])) {
@@ -158,24 +123,34 @@ class JsonApiView extends View
             $fieldsets = $this->viewVars['_fieldsets'];
         }
 
-        $links = $this->_links;
-        if (isset($this->viewVars['_links'])) {
-            $links = array_merge($this->_links, $this->viewVars['_links']);
+        if (isset($this->viewVars['_serialize'])) {
+            $serialize = $this->viewVars['_serialize'];
         }
+
+        if (isset($this->viewVars['_links'])) {
+            $links = $this->viewVars['_links'];
+        }
+
+        if (isset($this->viewVars['_meta'])) {
+            $meta = $this->viewVars['_meta'];
+        }
+
+        if (isset($this->viewVars['_serialize'])) {
+            $serialize = $this->viewVars['_serialize'];
+        }
+
+        $encoderOptions = new EncoderOptions($jsonOptions, $url);
+        $encoder = Encoder::instance($schemas, $encoderOptions);
 
         if ($links) {
             $encoder->withLinks($links);
-        }
-
-        $meta = $this->_meta;
-        if (isset($this->viewVars['_meta'])) {
-            $meta = array_merge($this->_meta, $this->viewVars['_meta']);
         }
 
         if ($meta) {
             if (empty($serialize)) {
                 return $encoder->encodeMeta($meta);
             }
+
             $encoder->withMeta($meta);
         }
 

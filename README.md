@@ -9,14 +9,13 @@
 
 ![json:api](http://jsonapi.org/images/jsonapi.png)
 
-This plugin implements [neomerx/json-api](https://github.com/neomerx/json-api) for cakephp3.
+This plugin implements [neomerx/json-api](https://github.com/neomerx/json-api) as a View class for cakephp3.
 
 > JSON API is a specification for how a client should request that resources be fetched or modified, and how a server should respond to those requests.
 >
 > JSON API is designed to minimize both the number of requests and the amount of data transmitted between clients and servers. This efficiency is achieved without compromising readability, flexibility, or discoverability.
 >
 > JSON API requires use of the JSON API media type (application/vnd.api+json) for exchanging data.
-
 
 ## Disclaimer
 
@@ -34,29 +33,62 @@ composer require josbeir/cakephp-json-api
 
 ## Usage
 
+This plugin works by using [neomerx/json-api](https://github.com/neomerx/json-api) php module at its core, my advice is to read up on the docs before proceeding.
+
 Load the plugin by adding it to your bootstrap.php
 
 ```php
 Plugin::load('JsonApi');
 ```
 
-Load the component
+or
 
-```php
-$this->loadComponent('JsonApi.JsonApi', [
-	'meta' => [], // global meta
-	'links' => [], // global links
-	'url' => Router::url('/api', true), // base url of the api
-	'entities' => [ // entities that will be mapped to a schema
-		'Article',
-		'Author'
-	]
-]);
+```
+$ bin/cake plugin load JsonApi
 ```
 
-In your controller action (trying to follow known cake concepts) we use **_serialize** to pass our results the **JsonApiView** class (this is where most of the magic happens).
+Then tell your controller to use the JsonApi view
 
 ```php
+$this->viewBuilder()->className('JsonApi.JsonApi');
+```
+
+We use **_serialize** to pass results the **JsonApiView** class (this is where most of the magic happens).
+
+The following variables can be assigned in your controller
+
+* `_serialize` This holds the actual data to pass to the encoder
+* `_url` The base url of the api endpoint
+* `_entities` **required** A list of entities that are going to be mapped to Schemas
+* `_include` An array of hash paths of what should be in the [included](http://jsonapi.org/format/#fetching-includes) section of the response.
+	`[ 'posts.author' ]`
+* `_fieldsets` A hash path of fields a list of names that should be in the resultset 	``[ 'sites'  => ['name'], 'people' => ['first_name'] ]```
+* `_meta` Metadata to add to the document
+* `_links` Links to add to the document this should be an array of ``Neomerx\JsonApi\Schema\Link`` objects.
+	
+	```php
+	$this->set('_links', [
+		Link::FIRST => new Link('/authors?page=1'),
+		Link::LAST  => new Link('/authors?page=4'),
+		Link::NEXT  => new Link('/authors?page=6'),
+		Link::LAST  => new Link('/authors?page=9'),
+	]);
+	```
+
+#### example
+
+```php
+public function initialize()
+{
+	$this->viewBuilder()->className('JsonApi.JsonApi');
+	
+	$this->set('_url', Router::url('/api', true));
+	$this->set('_entities', [
+		'Article',
+		'Author'
+	]);
+}
+
 public function index()
 {
 	$clients = $this->Articles->find()
@@ -77,33 +109,15 @@ public function index()
 }
 ```
 
-## Configuration
+## Schemas
 
-This plugin works by using [neomerx/json-api](https://github.com/neomerx/json-api) php module at its core, my advice is to read up on the docs before proceeding.
+Entities assigned in `_entities` are mapped to the `EntitySchema` base class. This class extends `Neomerx\JsonApi\Schema\SchemaProvider`.
 
-Instead of configuring the whole mapping by hand the only thing that is required to get going is to define your entity names in the **entities** array when loading the component.
+It is **recommended** that you create a schema class for each entity you defined by extending the EntitySchema class. Example: if you have an entity in ``Model\Entity\Author`` then create a schema class in ``View\Schema\AuthorSchema``
 
-Entities will be mapped to the ``EntitySchema`` base class. This class extends `Neomerx\JsonApi\Schema\SchemaProvider`.
+Think of the Schema class as a template that represents an Entity.
 
-It is recommended that you create a schema for each entity by extending the EntitySchema class. If you have an entity in ``Model\Entity\Author`` then you need to create a schema in ``View\Schema\AuthorSchema``
-
-### Views and schema's
-
-Think of the schema as a template that represents an entity. Because of this it is possible to get access to the current view object, helpers are also available using the views magic accessors just like you would expect in normal templates.
-
-```$this->getView()``` can be called inside the schema if you want to do some fancy view stuff.
-
-### Routing
-
-Cake's built in resource routing should work out of the box, a bit of fine tuning could be needed depending on the type of application you are working on.
-
-```php
-$routes->scope('/api', function($routes) {
-    $routes->resources('Authors', function($routes) {
-        $routes->resources('Articles');
-    });
-});
-```
+Because of this it is possible access the current view object along with Request and helpers. ```$this->getView()``` can be called inside the schema if you need it.
 
 ### Schema example
 
@@ -143,25 +157,12 @@ class AuthorSchema extends EntitySchema
 }
 ```
 
-Will output something like
+## Request handling and routing
 
-```json
-{
-    "data": [
-        {
-            "type": "authors",
-            "id": "1",
-            "attributes": {
-                "title": null,
-                "body": null,
-                "published": null
-            },
-	...
-	...
+This plugin does *not* handle this for you but can be easily added to your application using cake's [RequestHandler](http://book.cakephp.org/3.0/en/controllers/components/request-handling.html) component which has support for the json-api Content-Type.
 
-```
+For instance, if you want to automatically decode incoming json-api data (application/vnd.api+json) you can tell 
 
-## Todo
+RESTfull routing can also be achieved by creating [resource routes](http://book.cakephp.org/3.0/en/development/routing.html#creating-restful-routes).
 
-* Implement a custom resource routing class
-* Component option to automatically add pagination metadata
+

@@ -20,7 +20,7 @@ class JsonApiViewTest extends TestCase
         parent::setUp();
     }
 
-    protected function _getView($viewOptions = [], $viewVars = [])
+    protected function _getView($viewVars = [])
     {
         $Request = new Request();
         $Response = new Response();
@@ -28,10 +28,6 @@ class JsonApiViewTest extends TestCase
 
         $builder = $Controller->viewBuilder();
         $builder->className('JsonApi\View\JsonApiView');
-
-        if ($viewOptions) {
-            $builder->options($viewOptions);
-        }
 
         if ($viewVars) {
             $Controller->set($viewVars);
@@ -47,14 +43,12 @@ class JsonApiViewTest extends TestCase
     public function testRenderUsingBaseSchema()
     {
         $records = TableRegistry::get('Articles')->find()->all();
-        $viewOptions = [
-            'url' => 'http://localhost',
-            'entities' => [
-                'Article'
-            ]
-        ];
 
-        $view = $this->_getView($viewOptions, [
+        $view = $this->_getView([
+            '_url' => 'http://localhost',
+            '_entities' => [
+                'Article'
+            ],
             '_serialize' => $records
         ]);
 
@@ -74,16 +68,14 @@ class JsonApiViewTest extends TestCase
             ->contain(['Articles'])
             ->all();
 
-        $viewOptions = [
-            'url' => 'http://localhost',
-            'entities' => [
+
+        $view = $this->_getView([
+            '_serialize' => $records,
+            '_url' => 'http://localhost',
+            '_entities' => [
                 'Author',
                 'Article'
             ]
-        ];
-
-        $view = $this->_getView($viewOptions, [
-            '_serialize' => $records
         ]);
 
         $this->assertJsonStringEqualsJsonFile(
@@ -96,11 +88,8 @@ class JsonApiViewTest extends TestCase
     {
         $records = TableRegistry::get('Articles')->find()->all();
 
-        $viewOptions = [
-            'entities' => [ 'Article' ]
-        ];
-
-        $view = $this->_getView($viewOptions, [
+        $view = $this->_getView([
+            '_entities' => [ 'Article' ],
             '_serialize' => $records
         ]);
 
@@ -119,15 +108,12 @@ class JsonApiViewTest extends TestCase
             ->contain(['Articles'])
             ->all();
 
-        $viewOptions = [
-            'url' => 'http://localhost',
-            'entities' => [
+        $view = $this->_getView([
+            '_url' => 'http://localhost',
+            '_entities' => [
                 'Author',
                 'Article'
-            ]
-        ];
-
-        $view = $this->_getView($viewOptions, [
+            ],
             '_serialize' => $records,
             '_include' => [ 'articles' ],
             '_fieldsets' => [ 'articles' => [ 'title' ] ]
@@ -154,13 +140,11 @@ class JsonApiViewTest extends TestCase
     public function testOnlyMetaData()
     {
         $meta = [ 'meta' => 'data' ];
-        $viewOptions = [
-            'url' => 'http://localhost',
-            'entities' => [
+        $view = $this->_getView([
+            '_url' => 'http://localhost',
+            '_entities' => [
                 'Article'
-            ]
-        ];
-        $view = $this->_getView($viewOptions, [
+            ],
             '_meta' => $meta
         ]);
 
@@ -172,14 +156,12 @@ class JsonApiViewTest extends TestCase
     public function testResponseWithLinks()
     {
         $records = TableRegistry::get('Articles')->find()->all();
-        $viewOptions = [
-            'url' => 'http://localhost',
-            'entities' => [
-                'Article'
-            ]
-        ];
 
-        $view = $this->_getView($viewOptions, [
+        $view = $this->_getView([
+            '_url' => 'http://localhost',
+            '_entities' => [
+                'Article'
+            ],
             '_serialize' => $records,
             '_links' => [
                 Link::FIRST => new Link('/authors?page=1'),
@@ -210,14 +192,14 @@ class JsonApiViewTest extends TestCase
 
     public function testJsonOptions()
     {
-        $view = $this->_getView([], [
+        $view = $this->_getView([
             '_jsonOptions' => JSON_HEX_QUOT
         ]);
 
         $view->render();
         $this->assertEquals(8, $view->viewVars['_jsonOptions']);
 
-        $view = $this->_getView([], [
+        $view = $this->_getView([
             '_jsonOptions' => false
         ]);
 
@@ -238,7 +220,7 @@ class JsonApiViewTest extends TestCase
         $this->setExpectedException('Cake\ORM\Exception\MissingEntityException');
 
         $view = $this->_getView([
-            'entities' => [ 'FakeEntity' ]
+            '_entities' => [ 'FakeEntity' ]
         ]);
 
         $output = $view->render();
