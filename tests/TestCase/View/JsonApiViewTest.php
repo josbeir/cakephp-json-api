@@ -153,9 +153,13 @@ class JsonApiViewTest extends TestCase
     }
 
 
-    public function testResponseWithLinks()
+    public function testResponseWithLinksAndMeta()
     {
         $records = TableRegistry::get('Articles')->find()->all();
+
+        $expectedMeta = [
+            'meta' => 'data'
+        ];
 
         $view = $this->_getView([
             '_url' => 'http://localhost',
@@ -163,6 +167,7 @@ class JsonApiViewTest extends TestCase
                 'Article'
             ],
             '_serialize' => $records,
+            '_meta' => $expectedMeta,
             '_links' => [
                 Link::FIRST => new Link('/authors?page=1'),
                 Link::LAST => new Link('/authors?page=4'),
@@ -176,7 +181,7 @@ class JsonApiViewTest extends TestCase
         $output = $view->render();
         $output = json_decode($output, true);
 
-        $expected = [
+        $expectedLinks = [
             'first' => 'http://localhost/authors?page=1',
             'last' => [
                 'href' => 'http://localhost/authors?page=9',
@@ -187,7 +192,8 @@ class JsonApiViewTest extends TestCase
             'next' => 'http://localhost/authors?page=6'
         ];
 
-        $this->assertArraySubset(['links' => $expected], $output);
+        $this->assertArraySubset(['meta' => $expectedMeta], $output);
+        $this->assertArraySubset(['links' => $expectedLinks], $output);
     }
 
     public function testJsonOptions()
