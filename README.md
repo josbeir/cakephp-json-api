@@ -55,26 +55,17 @@ $this->viewBuilder()->className('JsonApi.JsonApi');
 
 The following view variables can be assigned in your controller
 
-* `_serialize` this holds the actual data to pass to the encoder instance, can be an array of entities, a single entity.
-* `_url` the base url of the api endpoint
-* `_entities` **required** A list of entities that are going to be mapped to Schemas
-* `_include` an array of hash paths what should be in the [included](http://jsonapi.org/format/#fetching-includes) section of the response.
-    `[ 'posts.author', 'comments' ]`
-* `_fieldsets` A hash path of fields should be in the resultset
-    `[ 'sites'  => ['name'], 'people' => ['first_name'] ]`
-* `_meta` meta data to add to the document
-* `_links` links to add to the document this should be an array of ``Neomerx\JsonApi\Schema\Link`` objects.
-	
-	```php
-	$this->set('_links', [
-		Link::FIRST => new Link('/authors?page=1'),
-		Link::LAST  => new Link('/authors?page=4'),
-		Link::NEXT  => new Link('/authors?page=6'),
-		Link::LAST  => new Link('/authors?page=9'),
-	]);
-	```
+| Variable | Description |
+| --- | --- |
+| `_serialize`| this holds the actual data to pass to the encoder instance, can be an array of entities, a single entity.|
+|`_url`| the base url of the api endpoint |
+|`_entities`|**required** A list of entities that are going to be mapped to Schemas|
+|`_include`| an array of hash paths what should be in the [included](http://jsonapi.org/format/#fetching-includes) section of the response. `[ 'posts.author', 'comments' ]`|
+|`_fieldsets`| A hash path of fields should be in the resultset `[ 'sites'  => ['name'], 'people' => ['first_name'] ]` |
+|`_meta`| meta data to add to the document |
+|`_links`| links to add to the document this should be an array of ``Neomerx\JsonApi\Schema\Link`` objects.|
 
-#### example
+#### Example
 
 ```php
 public function initialize()
@@ -161,8 +152,18 @@ class AuthorSchema extends EntitySchema
 
 This plugin does *not* handle this for you but can be easily added to your application using cake's [RequestHandler](http://book.cakephp.org/3.0/en/controllers/components/request-handling.html) component which has support for the json-api Content-Type.
 
-For instance, if you want to automatically decode incoming json-api data (application/vnd.api+json) you can tell 
+For instance, if you want to automatically decode incoming json-api *(application/vnd.api+json)* data you can tell RequestHandler to automaticaly handle it.
+
+```php
+$this->RequestHandler->config('inputTypeMap.jsonapi', ['json_decode', true]);
+```
 
 RESTfull routing can also be achieved by creating [resource routes](http://book.cakephp.org/3.0/en/development/routing.html#creating-restful-routes).
 
-
+```php
+Router::scope('/api', function($routes) {
+	$routes->resources('Articles', function($routes) {
+		$routes->resources('Authors');
+	});
+});
+```
