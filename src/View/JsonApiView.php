@@ -9,6 +9,7 @@ use Cake\Network\Response;
 use Cake\ORM\Exception\MissingEntityException;
 use Cake\Utility\Hash;
 use Cake\View\View;
+use JsonApi\View\Exception\MissingViewVarException;
 use Neomerx\JsonApi\Encoder\Encoder;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Parameters\EncodingParameters;
@@ -43,9 +44,15 @@ class JsonApiView extends View
      *   If the schema class does not exist, the default EntitySchema will be used.
      *
      * @return array A list of Entity class names as its key and a closure returning the schema class
+     * @throws MissingViewVarException when the _entities view variable is empty
+     * @throws MissingEntityException when defined entity class was not found in entities array
      */
     protected function _entitiesToSchema(array $entities)
     {
+        if (empty($entities)) {
+            throw new MissingViewVarException(['_entities']);
+        }
+
         $schemas = [];
         $entities = Hash::normalize($entities);
         foreach ($entities as $entityName => $options) {
@@ -100,6 +107,7 @@ class JsonApiView extends View
      * @param string|null $view Name of view file to use
      * @param string|null $layout Layout to use.
      * @return string The serialized data
+     * @throws MissingViewVarException when required view variable was not set
      */
     public function render($view = null, $layout = null)
     {
@@ -113,6 +121,8 @@ class JsonApiView extends View
 
         if (isset($this->viewVars['_entities'])) {
             $schemas = $this->_entitiesToSchema($this->viewVars['_entities']);
+        } else {
+            throw new MissingViewVarException(['_entities']);
         }
 
         if (isset($this->viewVars['_include'])) {

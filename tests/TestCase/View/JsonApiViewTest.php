@@ -199,14 +199,16 @@ class JsonApiViewTest extends TestCase
     public function testJsonOptions()
     {
         $view = $this->_getView([
-            '_jsonOptions' => JSON_HEX_QUOT
+            '_jsonOptions' => JSON_HEX_QUOT,
+            '_entities' => [ 'Article' ]
         ]);
 
         $view->render();
         $this->assertEquals(8, $view->viewVars['_jsonOptions']);
 
         $view = $this->_getView([
-            '_jsonOptions' => false
+            '_jsonOptions' => false,
+            '_entities' => [ 'Article' ]
         ]);
 
         $view->render();
@@ -215,10 +217,32 @@ class JsonApiViewTest extends TestCase
 
     public function testEmptyView()
     {
-        $view = $this->_getView();
+        $view = $this->_getView([
+            '_entities' => [ 'Article' ]
+        ]);
         $output = $view->render();
 
         $this->assertEquals(['data' => null], json_decode($output, true));
+    }
+
+    public function testEmptyEntitiesViewVarException()
+    {
+        $this->setExpectedException('JsonApi\View\Exception\MissingViewVarException');
+
+        $view = $this->_getView([
+            '_entities' => []
+        ]);
+
+        $output = $view->render();
+    }
+
+    public function testUndefinedEntitiesViewVarException()
+    {
+        $this->setExpectedException('JsonApi\View\Exception\MissingViewVarException');
+
+        $view = $this->_getView();
+
+        $output = $view->render();
     }
 
     public function testEntityNotFoundException()
