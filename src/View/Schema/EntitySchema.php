@@ -60,11 +60,11 @@ class EntitySchema extends SchemaProvider
      * Get resource id.
      *
      * @param \Cake\ORM\Entity $resource Entity resource
-     * @return mixed
+     * @return string
      */
     public function getId($resource)
     {
-        return $resource->get($this->idField);
+        return (string)$resource->get($this->idField);
     }
 
     /**
