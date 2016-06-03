@@ -57,20 +57,27 @@ class EntitySchema extends SchemaProvider
     }
 
     /**
-     * {@inheritDoc}
+     * Get resource id.
+     *
+     * @param \Cake\ORM\Entity $resource Entity resource
+     * @return string
      */
     public function getId($resource)
     {
-        return $resource->get($this->idField);
+        return (string)$resource->get($this->idField);
     }
 
     /**
-     * {@inheritDoc}
+     * Get resource attributes.
+     *
+     * @param \Cake\ORM\Entity $resource Entity resource
+     * @return array
      */
     public function getAttributes($resource)
     {
         if ($resource->has($this->idField)) {
-            $resource->hiddenProperties([$this->idField]);
+            $hidden = array_merge($resource->hiddenProperties(), [$this->idField]);
+            $resource->hiddenProperties($hidden);
         }
 
         return $resource->toArray();
