@@ -57,7 +57,10 @@ class EntitySchema extends SchemaProvider
     }
 
     /**
-     * {@inheritDoc}
+     * Get resource id.
+     *
+     * @param \Cake\ORM\Entity $resource
+     * @return array
      */
     public function getId($resource)
     {
@@ -65,7 +68,10 @@ class EntitySchema extends SchemaProvider
     }
 
     /**
-     * {@inheritDoc}
+     * Get resource attributes.
+     *
+     * @param \Cake\ORM\Entity $resource
+     * @return array
      */
     public function getAttributes($resource)
     {
