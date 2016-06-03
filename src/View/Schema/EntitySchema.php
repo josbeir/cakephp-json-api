@@ -59,7 +59,7 @@ class EntitySchema extends SchemaProvider
     /**
      * Get resource id.
      *
-     * @param \Cake\ORM\Entity $resource
+     * @param \Cake\ORM\Entity $resource Entity resource
      * @return mixed
      */
     public function getId($resource)
@@ -70,7 +70,7 @@ class EntitySchema extends SchemaProvider
     /**
      * Get resource attributes.
      *
-     * @param \Cake\ORM\Entity $resource
+     * @param \Cake\ORM\Entity $resource Entity resource
      * @return array
      */
     public function getAttributes($resource)
