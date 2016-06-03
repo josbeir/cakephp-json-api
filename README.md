@@ -89,10 +89,11 @@ public function initialize()
 
 public function index()
 {
-	$clients = $this->Articles->find()
+	$articles = $this->Articles->find()
 		->all();
 
-	$this->set('_serialize', $clients);
+	$this->set(compact('articles'));
+	$this->set('_serialize', true);
 
 	// optional parameters
 	$this->set('_include', [ 'articles', 'articles.comments' ]);

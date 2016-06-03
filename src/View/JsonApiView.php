@@ -18,6 +18,23 @@ use Neomerx\JsonApi\Schema\Link;
 class JsonApiView extends View
 {
     /**
+     * List of special view vars.
+     *
+     * @var array
+     */
+    protected $_specialVars = [
+        '_url',
+        '_entities',
+        '_include',
+        '_fieldsets',
+        '_links',
+        '_meta',
+        '_serialize',
+        '_jsonOptions',
+        '_jsonp'
+    ];
+
+    /**
      * Constructor
      *
      * @param \Cake\Network\Request $request Request instance.
@@ -56,7 +73,6 @@ class JsonApiView extends View
         $schemas = [];
         $entities = Hash::normalize($entities);
         foreach ($entities as $entityName => $options) {
-
             $entityclass = App::className($entityName, 'Model\Entity');
 
             if (!$entityclass) {
@@ -133,10 +149,6 @@ class JsonApiView extends View
             $fieldsets = $this->viewVars['_fieldsets'];
         }
 
-        if (isset($this->viewVars['_serialize'])) {
-            $serialize = $this->viewVars['_serialize'];
-        }
-
         if (isset($this->viewVars['_links'])) {
             $links = $this->viewVars['_links'];
         }
@@ -145,8 +157,11 @@ class JsonApiView extends View
             $meta = $this->viewVars['_meta'];
         }
 
-        if (isset($this->viewVars['_serialize'])) {
-            $serialize = $this->viewVars['_serialize'];
+//        if (isset($this->viewVars['_serialize'])) {
+//            $serialize = $this->viewVars['_serialize'];
+//        }
+        if (isset($this->viewVars['_serialize']) && $this->viewVars['_serialize'] !== false) {
+            $serialize = $this->_dataToSerialize($this->viewVars['_serialize']);
         }
 
         $encoderOptions = new EncoderOptions($jsonOptions, $url);
@@ -167,6 +182,40 @@ class JsonApiView extends View
         $parameters = new EncodingParameters($include, $fieldsets);
 
         return $encoder->encodeData($serialize, $parameters);
+    }
+
+    /**
+     * Returns data to be serialized.
+     *
+     * @param array|string|bool $serialize The name(s) of the view variable(s) that
+     *   need(s) to be serialized. If true all available view variables will be used.
+     * @return mixed The data to serialize.
+     */
+    protected function _dataToSerialize($serialize = true)
+    {
+        if ($serialize === true) {
+            $data = array_diff_key(
+                $this->viewVars,
+                array_flip($this->_specialVars)
+            );
+
+            if (empty($data)) {
+                return null;
+            }
+
+            return current($data);
+        }
+
+        if (is_object($serialize)) {
+            trigger_error('Assigning and object to "_serialize" is deprecated, assign the object to its own variable and assign "_serialize" = true instead.', E_USER_DEPRECATED);
+            return $serialize;
+        }
+
+        if (is_array($serialize)) {
+            $serialize = current($serialize);
+        }
+
+        return isset($this->viewVars[$serialize]) ? $this->viewVars[$serialize] : null;
     }
 
     /**
