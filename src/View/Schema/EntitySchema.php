@@ -70,7 +70,8 @@ class EntitySchema extends SchemaProvider
     public function getAttributes($resource)
     {
         if ($resource->has($this->idField)) {
-            $resource->hiddenProperties([$this->idField]);
+            $hidden = array_merge($resource->hiddenProperties(), [$this->idField]);
+            $resource->hiddenProperties($hidden);
         }
 
         return $resource->toArray();
