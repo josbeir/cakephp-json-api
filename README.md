@@ -117,7 +117,7 @@ Example App\View\Schema\AuthorSchema.php (maps to App\Model\Entity\Author)
 
 ```php
 <?php
-namespace TestApp\Schema;
+namespace TestApp\View\Schema;
 
 use JsonApi\Schema\EntitySchema;
 
