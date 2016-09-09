@@ -208,6 +208,7 @@ class JsonApiView extends View
 
         if (is_object($serialize)) {
             trigger_error('Assigning and object to "_serialize" is deprecated, assign the object to its own variable and assign "_serialize" = true instead.', E_USER_DEPRECATED);
+
             return $serialize;
         }
 
