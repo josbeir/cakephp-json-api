@@ -9,6 +9,9 @@ sudo: false
 env:
   - DB=sqlite
 
+  global:
+    - DEFAULT=1
+
 matrix:
   fast_finish: true
   include:
