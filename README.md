@@ -119,7 +119,7 @@ Example App\View\Schema\AuthorSchema.php (maps to App\Model\Entity\Author)
 <?php
 namespace TestApp\View\Schema;
 
-use JsonApi\Schema\EntitySchema;
+use JsonApi\View\Schema\EntitySchema;
 
 class AuthorSchema extends EntitySchema
 {
