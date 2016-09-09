@@ -7,10 +7,9 @@ php:
 sudo: false
 
 env:
-  - DB=sqlite
-
   global:
     - DEFAULT=1
+    - DB=sqlite
 
 matrix:
   fast_finish: true
