@@ -1,3 +1,5 @@
+### !!! THIS PLUGIN IS NOW DEPRECTATED, PLEASE REFER TO [crud-json-api](https://github.com/FriendsOfCake/crud-json-api) for a better alternative
+
 # json-api plugin for CakePHP 3
 
 [![Latest Stable Version](https://poser.pugx.org/josbeir/cakephp-json-api/v/stable)](https://packagist.org/packages/josbeir/cakephp-json-api)
